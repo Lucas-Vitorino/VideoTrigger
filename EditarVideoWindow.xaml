@@ -1,0 +1,122 @@
+<Window x:Class="CorpoHumanoInterativo.EditarVideoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Editar vídeo"
+        Height="430"
+        Width="520"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Background="#111827">
+
+    <Grid Margin="30">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Grid.Row="0"
+            Text="Editar vídeo"
+            Foreground="White"
+            FontSize="26"
+            FontWeight="Bold"
+            Margin="0,0,0,25"/>
+
+        <StackPanel Grid.Row="1"
+                    Margin="0,0,0,15">
+
+            <TextBlock
+                Text="Nome do botão"
+                Foreground="White"
+                FontSize="15"
+                Margin="0,0,0,5"/>
+
+            <TextBox
+                x:Name="NomeTextBox"
+                Height="35"
+                FontSize="15"
+                Padding="8,4"/>
+
+        </StackPanel>
+
+        <StackPanel Grid.Row="2"
+                    Margin="0,0,0,15">
+
+            <TextBlock
+                Text="Pino do Arduino"
+                Foreground="White"
+                FontSize="15"
+                Margin="0,0,0,5"/>
+
+            <ComboBox
+                x:Name="PinoComboBox"
+                Height="35"
+                FontSize="15"/>
+
+        </StackPanel>
+
+        <StackPanel Grid.Row="3">
+
+            <TextBlock
+                Text="Arquivo de vídeo"
+                Foreground="White"
+                FontSize="15"
+                Margin="0,0,0,5"/>
+
+            <Grid>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox
+                    x:Name="VideoTextBox"
+                    Grid.Column="0"
+                    Height="35"
+                    FontSize="14"
+                    IsReadOnly="True"
+                    Padding="8,4"/>
+
+                <Button
+                    Grid.Column="1"
+                    Content="Trocar vídeo"
+                    Width="130"
+                    Height="35"
+                    Margin="10,0,0,0"
+                    Click="BotaoSelecionarVideo_Click"/>
+
+            </Grid>
+
+        </StackPanel>
+
+        <StackPanel
+            Grid.Row="5"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right"
+            Margin="0,25,0,0">
+
+            <Button
+                Content="Cancelar"
+                Width="100"
+                Height="40"
+                Margin="5"
+                Click="BotaoCancelar_Click"/>
+
+            <Button
+                Content="Salvar"
+                Width="100"
+                Height="40"
+                Margin="5"
+                Click="BotaoSalvar_Click"/>
+
+        </StackPanel>
+
+    </Grid>
+
+</Window>

@@ -1,0 +1,17 @@
+[
+  {
+    "Nome": "Vídeo de abertura",
+    "Pino": 2,
+    "Video": "abertura.mp4"
+  },
+  {
+    "Nome": "Experimento",
+    "Pino": 3,
+    "Video": "experimento.mp4"
+  },
+  {
+    "Nome": "Encerramento",
+    "Pino": 4,
+    "Video": "encerramento.mp4"
+  }
+]

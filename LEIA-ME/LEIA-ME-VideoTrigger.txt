@@ -1,0 +1,505 @@
+VIDEOTRIGGER
+Guia de instalação, configuração e uso
+Versão 1.0
+
+============================================================
+1. SOBRE O PROJETO
+============================================================
+
+O VideoTrigger é um aplicativo desktop desenvolvido em C# com .NET e WPF
+que permite reproduzir vídeos através de botões físicos conectados a um
+Arduino.
+
+Cada botão físico é associado a um pino digital do Arduino. Quando o botão
+é pressionado, o Arduino envia o número do pino pela comunicação serial e
+o VideoTrigger reproduz automaticamente o vídeo configurado para aquele botão.
+
+Exemplo:
+
+Botão físico no pino D7
+        ↓
+Arduino envia PIN_7
+        ↓
+VideoTrigger identifica o cadastro associado ao pino 7
+        ↓
+Reproduz o vídeo correspondente
+
+============================================================
+2. PRINCIPAIS FUNCIONALIDADES
+============================================================
+
+- Conexão com Arduino pela porta serial
+- Detecção de portas COM disponíveis
+- Associação de vídeos a pinos digitais
+- Reprodução por botões físicos
+- Reprodução por botões da interface
+- Pausar e continuar vídeos
+- Adicionar novos vídeos
+- Editar vídeos cadastrados
+- Alterar o pino associado
+- Substituir o arquivo de vídeo
+- Excluir cadastros
+- Excluir arquivos de vídeo
+- Persistência das configurações em videos.json
+
+============================================================
+3. REQUISITOS
+============================================================
+
+- Windows 10 ou Windows 11 de 64 bits
+- Arduino Uno ou placa compatível
+- Cabo USB
+- Botões
+- Fios/jumpers
+- Vídeos no formato MP4
+
+O aplicativo é publicado como self-contained, portanto o computador que
+irá executá-lo não precisa ter o .NET instalado.
+
+Dependendo da placa, pode ser necessário instalar o driver USB correspondente.
+
+============================================================
+4. ESTRUTURA DA PASTA
+============================================================
+
+Mantenha todos os arquivos juntos.
+
+VideoTrigger-Publicacao/
+│
+├── VideoTrigger.exe
+├── VideoTrigger.dll
+├── videos.json
+├── demais DLLs e arquivos do programa
+│
+├── Videos/
+│   ├── exemplo1.mp4
+│   ├── exemplo2.mp4
+│   └── outros vídeos...
+│
+├── Arduino/
+│   └── VideoTrigger.ino
+│
+└── LEIA-ME.txt
+
+IMPORTANTE:
+Não mova somente o arquivo VideoTrigger.exe.
+
+O programa depende dos demais arquivos da pasta, do videos.json e da
+pasta Videos.
+
+============================================================
+5. PREPARANDO O ARDUINO
+============================================================
+
+Se o Arduino já estiver programado com o código do projeto, pule para
+a seção "Conectando o Arduino ao VideoTrigger".
+
+Para preparar uma nova placa:
+
+1. Instale e abra o Arduino IDE.
+2. Conecte o Arduino ao computador.
+3. Abra o arquivo Arduino\VideoTrigger.ino.
+4. Selecione a placa correta.
+5. Selecione a porta COM correspondente ao Arduino.
+6. Envie o código para a placa.
+
+O Arduino utiliza comunicação serial a 9600 baud.
+
+============================================================
+6. CÓDIGO DO ARDUINO
+============================================================
+
+O Arduino não precisa conhecer os nomes dos vídeos. Ele apenas informa ao
+computador qual pino foi pressionado.
+
+Exemplo:
+D2 → PIN_2
+D3 → PIN_3
+D7 → PIN_7
+
+Código:
+
+const int PINO_INICIAL = 2;
+const int PINO_FINAL = 13;
+
+bool estadoAnterior[14];
+
+void setup()
+{
+    Serial.begin(9600);
+
+    for (int pino = PINO_INICIAL; pino <= PINO_FINAL; pino++)
+    {
+        pinMode(pino, INPUT_PULLUP);
+        estadoAnterior[pino] = HIGH;
+    }
+}
+
+void loop()
+{
+    for (int pino = PINO_INICIAL; pino <= PINO_FINAL; pino++)
+    {
+        bool estadoAtual = digitalRead(pino);
+
+        if (estadoAnterior[pino] == HIGH &&
+            estadoAtual == LOW)
+        {
+            Serial.print("PIN_");
+            Serial.println(pino);
+        }
+
+        estadoAnterior[pino] = estadoAtual;
+    }
+
+    delay(30);
+}
+
+============================================================
+7. LIGAÇÃO DOS BOTÕES
+============================================================
+
+Podem ser utilizados os pinos digitais D2 até D13.
+
+Não utilize D0 e D1, pois esses pinos estão relacionados à comunicação
+serial do Arduino.
+
+Cada botão deve ser ligado entre um pino digital e o GND.
+
+Exemplo:
+
+D2 -------- BOTÃO -------- GND
+D3 -------- BOTÃO -------- GND
+D4 -------- BOTÃO -------- GND
+
+É possível utilizar o mesmo GND para vários botões.
+
+O projeto utiliza INPUT_PULLUP, portanto não é necessário resistor externo
+nessa montagem.
+
+============================================================
+8. COMO O SISTEMA FUNCIONA
+============================================================
+
+Botão físico
+    ↓
+Arduino
+    ↓
+PIN_X
+    ↓
+VideoTrigger
+    ↓
+videos.json
+    ↓
+Vídeo associado
+    ↓
+Reprodução
+
+Exemplo:
+
+Nome: Apresentação
+Pino: 7
+Vídeo: apresentacao.mp4
+
+Ligação física:
+
+D7 -------- BOTÃO -------- GND
+
+Quando o botão é pressionado, o Arduino envia PIN_7 e o VideoTrigger
+reproduz apresentacao.mp4.
+
+============================================================
+9. ABRINDO O VIDEOTRIGGER
+============================================================
+
+1. Extraia completamente o arquivo ZIP.
+2. Conecte o Arduino ao computador pelo cabo USB.
+3. Abra VideoTrigger.exe.
+4. Selecione a porta COM correspondente à placa.
+5. Clique em Conectar.
+6. O status deverá mudar para algo semelhante a:
+
+   Conectado em COM10
+
+A porta COM pode variar de um computador para outro.
+
+============================================================
+10. COMO DESCOBRIR A PORTA COM
+============================================================
+
+1. Desconecte o Arduino.
+2. Observe quais portas aparecem.
+3. Conecte novamente o Arduino.
+4. Clique em Atualizar no VideoTrigger.
+5. A nova porta normalmente corresponde ao Arduino.
+
+Também é possível verificar no Windows:
+
+Gerenciador de Dispositivos
+→ Portas (COM e LPT)
+
+============================================================
+11. REPRODUZINDO UM VÍDEO
+============================================================
+
+Depois que o Arduino estiver conectado:
+
+1. Pressione um botão físico.
+2. O Arduino identifica o pino.
+3. O VideoTrigger encontra o vídeo associado.
+4. O vídeo começa automaticamente.
+
+Também é possível clicar diretamente no botão correspondente na interface.
+
+============================================================
+12. PAUSAR E CONTINUAR
+============================================================
+
+Durante a reprodução, clique em Pausar.
+
+O botão mudará para Continuar.
+
+Clique novamente para retomar o vídeo do mesmo ponto.
+
+============================================================
+13. ADICIONAR UM NOVO VÍDEO
+============================================================
+
+Clique em:
+
++ Adicionar vídeo
+
+Informe:
+
+- Nome do botão
+- Pino do Arduino
+- Arquivo MP4
+
+Depois clique em Salvar.
+
+O VideoTrigger irá:
+
+- cadastrar o novo botão;
+- associar o botão ao pino escolhido;
+- copiar o vídeo para a pasta Videos;
+- atualizar o arquivo videos.json;
+- criar automaticamente o botão na tela.
+
+Depois ligue fisicamente o botão ao mesmo pino.
+
+============================================================
+14. EDITAR UM VÍDEO
+============================================================
+
+1. Clique em Gerenciar vídeos.
+2. Selecione o cadastro.
+3. Clique em Editar selecionado.
+
+É possível alterar:
+
+- Nome
+- Pino
+- Arquivo de vídeo
+
+Se o pino for alterado, a ligação física também deve ser alterada.
+
+============================================================
+15. EXCLUIR UM VÍDEO
+============================================================
+
+1. Clique em Gerenciar vídeos.
+2. Selecione o cadastro.
+3. Clique em Excluir selecionado.
+4. Confirme a exclusão.
+
+O programa também pode perguntar se deseja excluir o arquivo de vídeo
+da pasta Videos.
+
+Depois da exclusão:
+
+- o botão desaparece da interface;
+- o cadastro é removido do videos.json;
+- o pino volta a ficar disponível.
+
+============================================================
+16. SOBRE O ARQUIVO videos.json
+============================================================
+
+O arquivo videos.json armazena as configurações dos botões.
+
+Exemplo:
+
+[
+  {
+    "Nome": "Apresentação",
+    "Pino": 2,
+    "Video": "apresentacao.mp4"
+  },
+  {
+    "Nome": "Experimento",
+    "Pino": 3,
+    "Video": "experimento.mp4"
+  }
+]
+
+Normalmente não é necessário editar esse arquivo manualmente.
+
+Utilize as funções Adicionar, Editar e Excluir do próprio VideoTrigger.
+
+============================================================
+17. SOBRE A PASTA Videos
+============================================================
+
+Todos os vídeos utilizados pelo aplicativo ficam na pasta Videos.
+
+Ao adicionar um vídeo pela interface, o arquivo selecionado é copiado
+automaticamente para essa pasta.
+
+Formato recomendado: MP4.
+
+Se o cadastro existir, mas o arquivo não estiver na pasta Videos, o
+VideoTrigger exibirá uma mensagem informando que o vídeo não foi encontrado.
+
+============================================================
+18. PROBLEMAS COMUNS
+============================================================
+
+PROBLEMA:
+Nenhuma porta COM aparece.
+
+SOLUÇÕES:
+- Confira se o Arduino está conectado.
+- Clique em Atualizar.
+- Teste outro cabo USB.
+- Teste outra porta USB.
+- Verifique o Gerenciador de Dispositivos.
+- Instale o driver correto da placa, caso necessário.
+
+------------------------------------------------------------
+
+PROBLEMA:
+Não foi possível conectar à porta COM.
+
+SOLUÇÕES:
+- Feche o Monitor Serial do Arduino IDE.
+- Feche outros programas que estejam usando a porta.
+- Desconecte e conecte novamente o Arduino.
+- Clique em Atualizar.
+- Tente novamente.
+
+------------------------------------------------------------
+
+PROBLEMA:
+O botão da interface funciona, mas o botão físico não.
+
+VERIFIQUE:
+- O VideoTrigger está conectado ao Arduino?
+- O pino cadastrado corresponde ao pino físico?
+- O botão está ligado entre o pino e o GND?
+- O Arduino está com o código correto?
+- O Monitor Serial está fechado?
+
+------------------------------------------------------------
+
+PROBLEMA:
+Aparece "Vídeo não encontrado".
+
+VERIFIQUE:
+- O arquivo existe na pasta Videos?
+- O cadastro está apontando para o arquivo correto?
+- O vídeo foi removido manualmente?
+
+------------------------------------------------------------
+
+PROBLEMA:
+O programa não abre em outro computador.
+
+VERIFIQUE:
+- O ZIP foi totalmente extraído?
+- Todos os arquivos da publicação foram mantidos juntos?
+- O sistema é Windows 64 bits?
+- O antivírus ou as políticas de segurança bloquearam o executável?
+
+============================================================
+19. CUIDADOS IMPORTANTES
+============================================================
+
+- Não utilize os pinos D0 e D1.
+- Não envie somente o arquivo .exe.
+- Mantenha todas as DLLs junto do aplicativo.
+- Mantenha o videos.json junto do aplicativo.
+- Mantenha a pasta Videos junto do aplicativo.
+- Sempre extraia o ZIP antes de executar.
+- Não execute o programa diretamente de dentro do ZIP.
+- Feche o Monitor Serial antes de conectar pelo VideoTrigger.
+- Faça backup do videos.json se criar uma configuração importante.
+
+============================================================
+20. PUBLICANDO O PROJETO
+============================================================
+
+Para gerar uma versão para Windows 64 bits que não exige instalação
+do .NET:
+
+dotnet publish -c Release -r win-x64 --self-contained true -o ".\VideoTrigger-Publicacao"
+
+Compacte a pasta VideoTrigger-Publicacao inteira em ZIP para distribuição.
+
+============================================================
+21. RESUMO RÁPIDO
+============================================================
+
+PARA USAR:
+
+1. Extrair o ZIP.
+2. Conectar o Arduino.
+3. Abrir VideoTrigger.exe.
+4. Selecionar a porta COM.
+5. Clicar em Conectar.
+6. Pressionar os botões físicos.
+
+PARA ADICIONAR:
+
+1. Clique em + Adicionar vídeo.
+2. Digite o nome.
+3. Escolha o pino.
+4. Escolha o MP4.
+5. Salve.
+6. Ligue o botão físico ao mesmo pino.
+
+PARA EDITAR OU EXCLUIR:
+
+1. Clique em Gerenciar vídeos.
+2. Selecione o cadastro.
+3. Escolha Editar ou Excluir.
+
+============================================================
+22. POSSÍVEIS APLICAÇÕES
+============================================================
+
+- Feiras de Ciências
+- Exposições
+- Museus
+- Maquetes interativas
+- Totens multimídia
+- Atividades educacionais
+- Apresentações interativas
+- Projetos Maker
+- Instalações artísticas
+- Demonstrações de produtos
+- Protótipos com Arduino
+
+============================================================
+23. TECNOLOGIAS UTILIZADAS
+============================================================
+
+- C#
+- .NET
+- WPF
+- Arduino
+- Comunicação Serial
+- JSON
+- System.IO.Ports
+
+============================================================
+FIM DO GUIA
+============================================================
